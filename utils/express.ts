@@ -12,7 +12,7 @@ export async function expressResponse(
   await log.dump();
   const validity = schema.safeParse({ ...data, metaLogId: log.id });
   if (!validity.success) {
-    return res.status(520).json({
+    return res.status(599).json({
       error: "The API is now serverless, NOT IN A GOOD WAY (⊙_⊙)",
       metaLogId: log.id,
     });
@@ -21,10 +21,10 @@ export async function expressResponse(
   return res.status(status).json({ ...data, metaLogId: log.id });
 }
 
-export const ExplosionsSchema = z.strictObject({
+export const explosionsSchema = z.strictObject({
   error: z.string().meta({
     description:
-      "Oh this error is really bad! Please tell me on Github if you get 520 status code. This error is sign of developer failure, not your query or server even.",
+      "Oh this error is really bad! Please tell me on Github if you get 599 status code. This error is sign of developer failure, not your query or server even.",
     example: "The API is now serverless, NOT IN A GOOD WAY (⊙_⊙)",
   }),
   metaLogId: z.uuidv4().meta({

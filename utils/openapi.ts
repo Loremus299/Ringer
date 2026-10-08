@@ -284,7 +284,7 @@ export class OpenAPIHandler {
     };
   }
   export() {
-    return JSON.stringify(this.openAPIObject, null, 2);
+    return this.openAPIObject;
   }
 }
 

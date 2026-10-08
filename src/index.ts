@@ -17,5 +17,5 @@ docs.response("/", "get", "520", "Blame the devs", ExplosionsSchema);
 router.get("/", (_req: Request, res: Response) => {
   const log = new Logger();
 
-  return expressResponse(res, log, indexGetResponse, 200, { ping: "pong" });
+  return expressResponse(res, log, indexResponse, 200, { ping: "pong" });
 });

@@ -31,5 +31,6 @@ router.use(
     spec: {
       url: "/openapi",
     },
+    theme: "deepSpace",
   }),
 );

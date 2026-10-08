@@ -21,7 +21,7 @@ export async function expressResponse(
   return res.status(status).json({ ...data, metaLogId: log.id });
 }
 
-export const ExplosionsSchema = z.object({
+export const ExplosionsSchema = z.strictObject({
   error: z.string().meta({
     description:
       "Oh this error is really bad! Please tell me on Github if you get 520 status code. This error is sign of developer failure, not your query or server even.",

@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const indexResponse = z.object({
+export const indexResponse = z.strictObject({
   ping: z
     .string()
     .meta({ example: "pong", description: "returns pong if api is up" }),

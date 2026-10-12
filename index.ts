@@ -4,6 +4,7 @@ import { router } from "./src";
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
+  DATABASE_URL: z.url().default("postgresql://postgres:postgres@localhost:5432/postgres"),
 });
 
 const envValidity = envSchema.safeParse(process.env);

@@ -1,15 +1,6 @@
 import express, { type Express } from "express";
-import z from "zod";
 import { router } from "./src";
-
-const envSchema = z.object({
-  PORT: z.coerce.number().default(3000),
-  DATABASE_URL: z.url().default("postgresql://postgres:postgres@localhost:5432/postgres"),
-});
-
-const envValidity = envSchema.safeParse(process.env);
-if (!envValidity.success) throw new Error("");
-export const env = envValidity.data;
+import { env } from "./lib/env";
 
 export const app: Express = express();
 app.use(router);

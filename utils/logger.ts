@@ -1,3 +1,6 @@
+import { db } from "../lib/db";
+import { loggerTable } from "../lib/db/schema";
+
 const C = {
   reset: "\x1b[0m",
   gray: "\x1b[90m",
@@ -152,7 +155,14 @@ export class Logger {
   private async dumpLogger() {
     const data = this.context[0];
     const fun = async (data: LogEntry[]) => {
-      //custom dump function
+      for (const logItem of data) {
+        await db.insert(loggerTable).values({
+          requestId: this.id,
+          key: logItem.key,
+          value: logItem.value,
+          timeStamp: logItem.time.toString(),
+        });
+      }
     };
     await fun(data);
     this.print();

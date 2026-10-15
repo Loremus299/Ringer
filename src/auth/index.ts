@@ -28,14 +28,15 @@ docs.response(
 
 authRouter.post("/create-user", async (req: Request, res: Response) => {
   const log = new Logger();
-  log.info({ route: "POST /auth/create-user", body: req.body });
+  log.info({ route: "POST /auth/create-user" });
 
   const bodyValidation = createUserSchema.safeParse(req.body);
   if (!bodyValidation.success) {
-    log.error({ route: "POST /auth/create-user", error: bodyValidation.error });
+    log.error({ error: bodyValidation.error.message });
     return expressResponse(res, log, genericError, 400, {
-      error: bodyValidation.error,
-      metaLogId: log.id,
+      error: bodyValidation.error.message,
     });
   }
+
+  log.data({ body: bodyValidation.data });
 });

@@ -16,6 +16,7 @@ import type {
 } from "drizzle-orm/pg-core";
 import type { Logger } from "./logger";
 import { Result } from "./result";
+import { db } from "../lib/db";
 
 type DB = PgAsyncTransaction<PgQueryResultHKT, EmptyRelations>;
 type Condition<T> = (
@@ -30,7 +31,7 @@ type ExecutableQuery<TResult> = {
 };
 
 function usableDB(tx?: DB) {
-  return tx!; //?? db
+  return tx ?? db;
 }
 
 interface DrizzleOpsInterface {

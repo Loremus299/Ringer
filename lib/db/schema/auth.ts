@@ -13,10 +13,11 @@ export const usersTable = pgTable("users", {
 
 export const userSessionsTable = pgTable("user_sessions", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
-  token: text("token").notNull().unique(),
+  token: text("token").notNull(),
 	userAgent: text("user_agent").notNull(),
 	
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+	userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
 
 	createdAt: timestamp("created_at").notNull().defaultNow(),
+	expiredAt: timestamp("expired_at").notNull().$defaultFn(() => new Date(Date.now() + 1000 * 60 * 60 * 24 * 30))
 })

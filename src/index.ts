@@ -4,6 +4,7 @@ import { indexResponse } from "./types";
 import { explosionsSchema, expressResponse } from "../utils/express";
 import { Logger } from "../utils/logger";
 import { apiReference } from "@scalar/express-api-reference";
+import { authRouter } from "./auth";
 
 export const router: Router = express.Router();
 
@@ -21,6 +22,8 @@ router.get("/", (_req: Request, res: Response) => {
 
   return expressResponse(res, log, indexResponse, 200, { ping: "pong" });
 });
+
+router.use("/auth", authRouter)
 
 router.use("/openapi", (_req: Request, res: Response) =>
   res.status(200).json(docs.export()),

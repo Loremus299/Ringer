@@ -6,8 +6,7 @@ import drizzleOps from "../../utils/drizzle";
 import { usersTable } from "../../lib/db/schema";
 import * as argon2 from "argon2";
 import zxcvbn from "zxcvbn";
-
-const usersTableCrud = drizzleOps.createCrud(usersTable, usersTable.id);
+import { db } from "../../lib/db";
 
 async function createUser(
 	values: z.infer<typeof createUserSchema>,
@@ -34,12 +33,22 @@ async function createUser(
 		async () => await argon2.hash(values.password),
 	);
 	if (!hashedPassword.value.success) return Result.error(500);
+	const hp = hashedPassword.value.data;
 
 	log.debug({ op: "db query" });
-	const q = await usersTableCrud.insert({ ...values }, log);
-	if (!q.value.success) return Result.error(500);
-
-	return Result.ok(q.value.data.id);
+	return (
+		await Result.tryCatch(
+			{},
+			async () =>
+				await db
+					.insert(usersTable)
+					.values({ ...values, password: hp })
+					.returning(),
+		)
+	).match(
+		(t) => Result.ok(t[0]!.id),
+		() => Result.error(500),
+	);
 }
 
 export const authService = {

@@ -16,7 +16,7 @@ authRouter.post("/create-user", async (req: Request, res: Response) => {
 		return await expressResponse(res, log, genericError, 400, {
 			error: "Failed to parse request body",
 		});
-	log.data({ body: reqBody.data });
+	log.data({ ...reqBody.data, password: "" });
 
 	return (await authService.createUser(reqBody.data, log)).match(
 		async (t) => {

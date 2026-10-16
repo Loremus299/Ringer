@@ -1,6 +1,12 @@
 import express, { type Router, type Request, type Response } from "express";
 import { Logger } from "../../utils/logger";
-import { createUser200, createUserSchema } from "./types";
+import {
+	createSession200,
+	createSessionHeaders,
+	createSessionSchema,
+	createUser200,
+	createUserSchema,
+} from "./types";
 import { explosionsSchema, expressResponse } from "../../utils/express";
 import { genericError } from "../types";
 import { authService } from "./service";
@@ -89,6 +95,94 @@ authRouter.post("/create-user", async (req: Request, res: Response) => {
 					error: "Password is too weak to be used",
 				});
 
+			if (e == 500)
+				return await expressResponse(res, log, genericError, 500, {
+					error: "Internal Server Error",
+				});
+		},
+	);
+});
+
+docs.path("/auth/create-session", "post", {
+	summary: "Create session",
+	description:
+		"Create session using login credentials for a user. Each session lasts 30 days or can be revoked manually using /auth/revoke-session endpoint",
+	tags: ["AUTH"],
+});
+docs.headers("/auth/create-session", "post", createSessionHeaders);
+docs.requestBody("/auth/create-session", "post", createSessionSchema);
+docs.response(
+	"/auth/create-session",
+	"post",
+	"200",
+	"session id for the user session",
+	createSession200,
+);
+docs.response(
+	"/auth/create-session",
+	"post",
+	"400",
+	"Failed parsing request",
+	genericError,
+);
+docs.response(
+	"/auth/create-session",
+	"post",
+	"404",
+	"User Credential Error",
+	genericError,
+);
+docs.response(
+	"/auth/create-session",
+	"post",
+	"500",
+	"Internal Server Error",
+	genericError,
+);
+docs.response(
+	"/auth/create-session",
+	"post",
+	"599",
+	"Blame the devs",
+	explosionsSchema,
+);
+authRouter.post("/create-session", async (req: Request, res: Response) => {
+	const log = new Logger();
+	log.info({ route: "POST /auth/create-session" });
+
+	const reqBody = createSessionSchema.safeParse(req.body);
+	if (!reqBody.success)
+		return await expressResponse(res, log, genericError, 400, {
+			error: "Failed to parse request body",
+		});
+	log.data({ ...reqBody.data, password: "" });
+
+	const reqHeaders = createSessionHeaders.safeParse(req.headers);
+	if (!reqHeaders.success)
+		return await expressResponse(res, log, genericError, 400, {
+			error: "Failed to parse request headers",
+		});
+	log.data({ ...reqHeaders.data });
+
+	return (
+		await authService.createSession(reqBody.data, reqHeaders.data, log)
+	).match(
+		async (t) => {
+			res.cookie("sessionId", t, {
+				httpOnly: true,
+				sameSite: "lax",
+				maxAge: 1000 * 60 * 60 * 24 * 30,
+				path: "/",
+			});
+			return await expressResponse(res, log, createSession200, 200, {
+				sessionId: t,
+			});
+		},
+		async (e) => {
+			if (e == 404)
+				return await expressResponse(res, log, genericError, 404, {
+					error: "Invalid user credentials or non existent user.",
+				});
 			if (e == 500)
 				return await expressResponse(res, log, genericError, 500, {
 					error: "Internal Server Error",

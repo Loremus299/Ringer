@@ -20,7 +20,9 @@
   "dependencies": {
     "@paralleldrive/cuid2": "^3.3.0",
     "@scalar/express-api-reference": "^0.10.28",
+    "@types/cors": "^2.8.19",
     "argon2": "^0.45.1",
+    "cors": "^2.8.6",
     "drizzle-orm": "^1.0.0-rc.4",
     "express": "^5.2.1",
     "pg": "^8.23.1",

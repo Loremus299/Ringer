@@ -1,8 +1,11 @@
 import z from "zod";
 
 const envSchema = z.object({
-  PORT: z.coerce.number().default(8080),
-  DATABASE_URL: z.coerce.string().default("postgresql://postgres:postgres@localhost:5432/postgres"),
+	PORT: z.coerce.number().default(8080),
+	DATABASE_URL: z.coerce
+		.string()
+		.default("postgresql://postgres:postgres@localhost:5432/postgres"),
+	FRONTEND_URL: z.coerce.string().default("http://localhost:3000"),
 });
 
 const envValidity = envSchema.safeParse(process.env);

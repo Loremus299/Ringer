@@ -172,7 +172,7 @@ authRouter.post("/create-session", async (req: Request, res: Response) => {
 		async (t) => {
 			res.cookie("sessionId", t, {
 				httpOnly: true,
-				sameSite: "lax",
+				sameSite: "none",
 				maxAge: 1000 * 60 * 60 * 24 * 30,
 				path: "/",
 			});

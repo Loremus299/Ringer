@@ -6,6 +6,8 @@ import {
 	createSessionSchema,
 	createUser200,
 	createUserSchema,
+	listSessions200,
+	listSessionsCookies,
 } from "./types";
 import { explosionsSchema, expressResponse } from "../../utils/express";
 import { genericError } from "../types";
@@ -115,7 +117,7 @@ docs.response(
 	"/auth/create-session",
 	"post",
 	"200",
-	"session id for the user session",
+	"session id for the user session (embedded in cookies as well)",
 	createSession200,
 );
 docs.response(
@@ -176,6 +178,77 @@ authRouter.post("/create-session", async (req: Request, res: Response) => {
 			});
 			return await expressResponse(res, log, createSession200, 200, {
 				sessionId: t,
+			});
+		},
+		async (e) => {
+			if (e == 404)
+				return await expressResponse(res, log, genericError, 404, {
+					error: "Invalid user credentials or non existent user.",
+				});
+			if (e == 500)
+				return await expressResponse(res, log, genericError, 500, {
+					error: "Internal Server Error",
+				});
+		},
+	);
+});
+
+docs.path("/auth/list-sessions", "get", {
+	summary: "List sessions",
+	description:
+		"List active user sessions. SessionId in case you want to revoke. User Agent, Creation and Expiration date",
+	tags: ["AUTH"],
+});
+docs.cookies("/auth/list-sessions", "get", listSessionsCookies);
+docs.response(
+	"/auth/list-sessions",
+	"get",
+	"200",
+	"Array of active sessions",
+	listSessions200,
+);
+docs.response(
+	"/auth/list-sessions",
+	"get",
+	"400",
+	"Failed parsing request",
+	genericError,
+);
+docs.response(
+	"/auth/list-sessions",
+	"get",
+	"404",
+	"User Credential Error",
+	genericError,
+);
+docs.response(
+	"/auth/list-sessions",
+	"get",
+	"500",
+	"Internal Server Error",
+	genericError,
+);
+docs.response(
+	"/auth/list-sessions",
+	"get",
+	"599",
+	"Blame the devs",
+	explosionsSchema,
+);
+authRouter.get("/list-sessions", async (req: Request, res: Response) => {
+	const log = new Logger();
+	log.info({ route: "GET /auth/list-sessions" });
+
+	const reqCookies = listSessionsCookies.safeParse(req.cookies);
+	if (!reqCookies.success)
+		return await expressResponse(res, log, genericError, 400, {
+			error: "Failed to parse request cookies",
+		});
+
+	return (await authService.listActiveSessions(reqCookies.data, log)).match(
+		async (t) => {
+			return await expressResponse(res, log, listSessions200, 200, {
+				sessions: t,
 			});
 		},
 		async (e) => {

@@ -53,3 +53,37 @@ export const createSession200 = z.strictObject({
 		description: "Logger ID for your request.",
 	}),
 });
+
+export const listSessionsCookies = z.object({
+	sessionId: z.string().meta({
+		example: "session-36b8f84d-df4e-4d49-b662-bcde71a8764f",
+		description: "session id",
+	}),
+});
+
+export const listSessions200 = z.strictObject({
+	sessions: z.array(
+		z.object({
+			sessionId: z.string().meta({
+				example: "session-36b8f84d-df4e-4d49-b662-bcde71a8764f",
+				description: "Session Id",
+			}),
+			userAgent: z.string().meta({
+				example: "Internet Explorer",
+				description: "User Agent of the session",
+			}),
+			createdAt: z.coerce.string().meta({
+				example: new Date().toISOString(),
+				description: "Creation date of the session cookie",
+			}),
+			expiryDate: z.coerce.string().meta({
+				example: new Date().toISOString(),
+				description: "Expiration date of the session cookie",
+			}),
+		}),
+	),
+	metaLogId: z.uuidv4().meta({
+		example: "36b8f84d-df4e-4d49-b662-bcde71a8764f",
+		description: "Logger ID for your request.",
+	}),
+});
